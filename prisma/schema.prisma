@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model forum {
+  id String @id @default(uuid())
+  name String
+  messages message[]
+}
+
+model message {
+  id String @id @default(uuid())
+  content String
+  forum forum? @relation(fields: [forumId], references: [id])
+  forumId String?
+}
+
+model items {
+  id String @id @default(uuid())
+  name String
+  description String
+  price String
+  messages bidding[]
+  sold Boolean  @default(false)
+  sold_price  Float? 
+}
+
+model bidding {
+  id String @id @default(uuid())
+  content String
+  items items? @relation(fields: [itemid], references: [id])
+  itemid String?
+}
+
+model Character {
+  id              String @id @default(uuid())
+  name            String
+  description     String
+  picture         String?
+  winRate         Float  @default(50.0)
+  highestWinStreak Int   @default(0)
+  currentWinStreak Int   @default(0)
+  wins            Int    @default(0)
+  losses          Int    @default(0)
+}
+
+model vehicles {
+  id          String  @id @default(uuid())
+  name        String
+  description String
+  ownerId     String
+  owner       persons @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  parkings parkings[]
+}
+
+model persons {
+  id          String @id @default(uuid())
+  description String
+  name        String
+  vehicles    vehicles[]
+}
+
+model parkingspaces {
+  id          String @id @default(uuid())
+  location    String
+  description String
+
+  parkings parkings[]
+}
+
+model parkings {
+  id            String   @id @default(uuid())
+  vehicleId     String
+  vehicle       vehicles @relation(fields: [vehicleId], references: [id])
+  parkingSpaceId String
+  parkingSpace  parkingspaces @relation(fields: [parkingSpaceId], references: [id])
+  startTime     DateTime
+  endTime       DateTime?
+  hourlyRate    Float
+  totalCost     Float?
+}
+
+
